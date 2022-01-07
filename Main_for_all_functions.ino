@@ -117,7 +117,7 @@ void setup() {
   //temperature sensor setup
   Serial.begin(9600);
   pinMode(device, OUTPUT);
-  Serial.print("Give input of Setpoint");
+  //Serial.print("Give input of Setpoint");
   // delay(2000);
   //***********************************
   //Keypad and LCD setup
@@ -192,11 +192,14 @@ void servo_home()
 //***********************************************************************
 void servo_garage()
 {
-
-  Serial.print("Analog Reading=");
-  Serial.print(IRvalueA);
-  Serial.print("\t Digital Reading=");
-  Serial.println(IRvalueD);
+   Serial.print(IRvalueA);
+   Serial.print(",");
+   Serial.print(IRvalueD);
+   Serial.print(",");
+  //Serial.print("Analog Reading=");
+  //Serial.print(IRvalueA);
+  //Serial.print("\t Digital Reading=");
+  //Serial.println(IRvalueD);
 
   if ((IRvalueD == HIGH) && (open_flag == 0))
   {
@@ -231,12 +234,16 @@ void temperature_sensor()
   float t = DHT.temperature;
   float h = DHT.humidity;
 
-  Serial.print("Temperature = ");
+  ////Serial.print("Temperature = ");
+  ////Serial.print(t);
+  ////Serial.print(" *C ");
+  ////Serial.print("    Humidity = ");
+  ////Serial.print(h);
+  ////Serial.println(" % ");
   Serial.print(t);
-  Serial.print(" *C ");
-  Serial.print("    Humidity = ");
-  Serial.print(h);
-  Serial.println(" % ");
+   Serial.print(",");
+   Serial.print(h);
+   Serial.print(",");
 
 }
 //********************************************************************************************************************//
@@ -244,12 +251,13 @@ void temperature_sensor()
 void smokedetector()
 {
   sensorValue = analogRead(Aoutpin);
-  Serial.print("Sensor Value: ");
-  Serial.print(sensorValue);
+  ////Serial.print("Sensor Value: ");
+  ////Serial.print(sensorValue);
+  Serial.print(sensorvalue);
   while ((sensorValue > 15000) && (!digitalRead(smokeoff_button)) && (!fire_acknowledge))
   {
     lcd.clear();
-    Serial.print(" | Smoke detected!");
+    ////Serial.print(" | Smoke detected!");
     digitalWrite(buzzer, !digitalRead(buzzer));
     digitalWrite(fireLED, !digitalRead(fireLED));
     lcd.setCursor(0, 0);
@@ -268,7 +276,7 @@ void smokedetector()
   }
   if (sensorValue < 900)
     fire_acknowledge = 0;
-  Serial.println("");
+  ////Serial.println("");
 }
 //********************************************************************************************************************//
 
@@ -282,11 +290,11 @@ void distancedetection()
   digitalWrite(trigPin, LOW);
   duration = pulseIn(echoPin, HIGH);
   distance = (duration / 2) / 29.1;
-  Serial.print(distance);
+  //Serial.print(distance);
   if (distance >= 5 || distance <= 0)
   {
     ledstate = 0;
-    Serial.println("Out of range");
+    ////Serial.println("Out of range");
     //digitalWrite(pindetection, LOW);
   }
   else {
@@ -294,20 +302,20 @@ void distancedetection()
       ledstate = 1;
 
       digitalWrite(pindetection, HIGH);
-      Serial.print(distance);
-      Serial.println(" cm");
+      //Serial.print(distance);
+      //Serial.println(" cm");
     }
     else
     { ledstate = 0;
       digitalWrite(pindetection, LOW);
-      Serial.print(distance);
-      Serial.println(" cm");
+      //Serial.print(distance);
+      //Serial.println(" cm");
     }
   }
      while(!lock &&(distance < 5)&&(!digitalRead(smokeoff_button))&&!(theft_acknowledge))
      {
       lcd.clear();
-    Serial.print(" BURGLAR ALARM!");
+    //Serial.print(" BURGLAR ALARM!");
     digitalWrite(buzzer, !digitalRead(buzzer));
     digitalWrite(fireLED, !digitalRead(fireLED));
     lcd.setCursor(0, 0);
@@ -327,7 +335,8 @@ void distancedetection()
   }
   if (distance >= 5)
     theft_acknowledge = 0;
-  Serial.println(smokeoff_button);
+  ////Serial.println(smokeoff_button);
+  
 }
 
 //*************************************************
@@ -336,21 +345,23 @@ void bluetoothmodule() {
   if (Serial.available() > 0) {
     // To read a data in integer form from HC05 via serial communication protocol
     setpoint = Serial.parseInt();
-    Serial.print("Set Point Changed: ");
-    Serial.println(setpoint1);
+    //Serial.print("Set Point Changed: ");
+    //Serial.println(setpoint1);
   }
   int temperature = analogRead(A1);
   temperature = map(temperature, 0, 1023, 0, 500);
-  Serial.print("Temperature = ");
-  Serial.println(temperature);
+  Serial.print(temperature);
+  Serial.print(",");
+  //Serial.print("Temperature = ");
+  //Serial.println(temperature);
 
   if (temperature >= setpoint1) {
     digitalWrite (device, HIGH);
-    Serial.println("Device is on");
+    //Serial.println("Device is on");
   }
   else if (temperature < setpoint1) {
     digitalWrite (device, LOW);
-    Serial.println("Device is off");
+    //Serial.println("Device is off");
   }
   delay(1000);
 }
@@ -525,20 +536,20 @@ void limit_switch()
 
   if (limitSwitch.isPressed())
   {
-    Serial.println("The limit switch: UNTOUCHED -> TOUCHED");
+    //Serial.println("The limit switch: UNTOUCHED -> TOUCHED");
     flag = 1;
   }
 
   if (limitSwitch.isReleased())
   {
-    Serial.println("The limit switch: TOUCHED -> UNTOUCHED");
+    //Serial.println("The limit switch: TOUCHED -> UNTOUCHED");
   }
 
   /*int state = limitSwitch.getState();
     if(state == HIGH)
-    Serial.println("The limit switch: UNTOUCHED");
+    //Serial.println("The limit switch: UNTOUCHED");
     else
-    Serial.println("The limit switch: TOUCHED");
+    //Serial.println("The limit switch: TOUCHED");
   */
   while ((flag == 1) && count >= 0)
   {
