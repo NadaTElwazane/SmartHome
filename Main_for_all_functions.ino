@@ -246,7 +246,7 @@ void smokedetector()
   sensorValue = analogRead(Aoutpin);
   Serial.print("Sensor Value: ");
   Serial.print(sensorValue);
-  while ((sensorValue > 900) && (!digitalRead(smokeoff_button)) && (!fire_acknowledge))
+  while ((sensorValue > 15000) && (!digitalRead(smokeoff_button)) && (!fire_acknowledge))
   {
     lcd.clear();
     Serial.print(" | Smoke detected!");
