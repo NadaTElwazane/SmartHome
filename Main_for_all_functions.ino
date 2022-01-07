@@ -192,10 +192,7 @@ void servo_home()
 //***********************************************************************
 void servo_garage()
 {
-   Serial.print(IRvalueA);
-   Serial.print(",");
-   Serial.print(IRvalueD);
-   Serial.print(",");
+  
   //Serial.print("Analog Reading=");
   //Serial.print(IRvalueA);
   //Serial.print("\t Digital Reading=");
@@ -253,7 +250,7 @@ void smokedetector()
   sensorValue = analogRead(Aoutpin);
   ////Serial.print("Sensor Value: ");
   ////Serial.print(sensorValue);
-  Serial.print(sensorvalue);
+  Serial.println(sensorValue);
   while ((sensorValue > 15000) && (!digitalRead(smokeoff_button)) && (!fire_acknowledge))
   {
     lcd.clear();
@@ -350,8 +347,8 @@ void bluetoothmodule() {
   }
   int temperature = analogRead(A1);
   temperature = map(temperature, 0, 1023, 0, 500);
-  Serial.print(temperature);
-  Serial.print(",");
+  //Serial.print(temperature);
+  //Serial.print(",");
   //Serial.print("Temperature = ");
   //Serial.println(temperature);
 
