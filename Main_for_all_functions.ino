@@ -65,6 +65,7 @@ int swimmingpoollow=42;
 int swimmingpoolhigh=40;
 const int autohigh=3;
 const int autolow=2;
+int drowning_acknowledge=0;
 int IRvalueAhigh = 0;
 int IRvalueDhigh = 0;
 int IRvalueAlow = 0;
@@ -202,15 +203,25 @@ void swimming_pool(){
   IRvalueDhigh = digitalRead(swimmingpoolhigh);
   IRvalueAlow = analogRead(autolow);
   IRvalueDlow = digitalRead(swimmingpoollow);
-  Serial.println(IRvalueDhigh);
-    Serial.println(IRvalueDlow);
-  if((IRvalueAlow==100) && (IRvalueAhigh==0))
+
+  while((IRvalueDlow==LOW) && (IRvalueDhigh==HIGH)&& (!digitalRead(smokeoff_button)) && (!drowning_acknowledge))
   {
     
     digitalWrite(buzzer, !digitalRead(buzzer));
+    delay(500);
     Serial.print("drowning level");
     Serial.println("");
   }
+  if (digitalRead(smokeoff_button))
+  {
+    drowning_acknowledge=1;
+  }
+  if(drowning_acknowledge==1){
+    digitalWrite(buzzer,LOW);
+
+  }
+  
+  drowning_acknowledge=0;
   
 }
 void servo_home()
