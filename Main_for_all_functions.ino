@@ -22,7 +22,7 @@ int val = 0;
 #define echoPin 13
 #define pindetection 6
 int ledstate = 0;
-int theft_acknowledge=0;
+int theft_acknowledge = 0;
 //******************************
 //initializing smoke detector
 //#define MQ2pin (0)
@@ -53,19 +53,20 @@ int unlocked = 0;
 //initialising temperature sensor
 int device = 4;
 int setpoint = 26;
+int AC_flag=0;
 #define AC 28
 #define dataPin 4
 dht DHT;
 //*****************************
 //initialising lock switch
-int lockswitch=52;
+int lockswitch = 52;
 //******************************
 //initializing swimming pool
-int swimmingpoollow=42;
-int swimmingpoolhigh=40;
-const int autohigh=3;
-const int autolow=2;
-int drowning_acknowledge=0;
+int swimmingpoollow = 42;
+int swimmingpoolhigh = 40;
+const int autohigh = 3;
+const int autolow = 2;
+int drowning_acknowledge = 0;
 int IRvalueAhigh = 0;
 int IRvalueDhigh = 0;
 int IRvalueAlow = 0;
@@ -132,7 +133,7 @@ void setup() {
   //temperature sensor setup
   Serial.begin(9600);
   pinMode(device, OUTPUT);
-  pinMode(AC,OUTPUT);
+  pinMode(AC, OUTPUT);
   //Serial.print("Give input of Setpoint");
   //***********************************
   //Keypad and LCD setup
@@ -150,20 +151,20 @@ void setup() {
   pinMode(pindetection, OUTPUT);
   //******************************
   //initializing lockswitch
-  pinMode(lockswitch,INPUT);
+  pinMode(lockswitch, INPUT);
   //*****************************
   //initializing swimmingpool
-  pinMode(swimmingpoolhigh,INPUT);
-  pinMode(swimmingpoollow,INPUT);
+  pinMode(swimmingpoolhigh, INPUT);
+  pinMode(swimmingpoollow, INPUT);
 }
 
 void loop() {
 
   // put your main code here, to run repeatedly:
   home_mode();
- distancedetection();
+  distancedetection();
 
-  if (lock == 1) {
+  if (lock == 1) {  //unlocked case
     touch_sensor();
     temperature_sensor();
     smokedetector();
@@ -172,8 +173,11 @@ void loop() {
     limit_switch();
     swimming_pool();
   }
-   else
-   digitalWrite(AC,LOW);
+  else  //locked case
+  {
+    digitalWrite(AC, LOW);
+    digitalWrite(pindetection,LOW);
+  }
 }
 //********************************************************************************************************************
 
@@ -198,15 +202,15 @@ void touch_sensor()
   }
 }
 //*********************************************************************
-void swimming_pool(){
+void swimming_pool() {
   IRvalueAhigh = analogRead(autohigh);
   IRvalueDhigh = digitalRead(swimmingpoolhigh);
   IRvalueAlow = analogRead(autolow);
   IRvalueDlow = digitalRead(swimmingpoollow);
 
-  while((IRvalueDlow==LOW) && (IRvalueDhigh==HIGH)&& (!digitalRead(smokeoff_button)) && (!drowning_acknowledge))
+  while ((IRvalueDlow == LOW) && (IRvalueDhigh == HIGH) && (!digitalRead(smokeoff_button)) && (!drowning_acknowledge))
   {
-    
+
     digitalWrite(buzzer, !digitalRead(buzzer));
     delay(500);
     Serial.print("drowning level");
@@ -214,26 +218,26 @@ void swimming_pool(){
   }
   if (digitalRead(smokeoff_button))
   {
-    drowning_acknowledge=1;
+    drowning_acknowledge = 1;
   }
-  if(drowning_acknowledge==1){
-    digitalWrite(buzzer,LOW);
+  if (drowning_acknowledge == 1) {
+    digitalWrite(buzzer, LOW);
 
   }
-  
-  drowning_acknowledge=0;
-  
+
+  drowning_acknowledge = 0;
+
 }
 void servo_home()
 {
- 
-  for (pos2 = 90; pos2 <= 180; pos2 += 1) { // goes from 0 degrees to 100 degrees
+
+  for (pos2 = 90; pos2 <= 270; pos2 += 1) { // goes from 0 degrees to 100 degrees
     // in steps of 1 degree
     door2.write(pos2);              // tell servo to go to position in variable 'pos'
     delay(10);
   }// waits 10 ms for the servo to reach the position
-  delay(3000);
-  for (pos2 = 180; pos2 >= 90; pos2 -= 1)
+  delay(1000);
+  for (pos2 = 270; pos2 >= 90; pos2 -= 1)
   {
     // goes from 100 degrees to 0 degrees
     door2.write(pos2);   // tell servo to go to position in variable 'pos'
@@ -244,7 +248,7 @@ void servo_home()
 //***********************************************************************
 void servo_garage()
 {
-  
+
   //Serial.print("Analog Reading=");
   //Serial.print(IRvalueA);
   //Serial.print("\t Digital Reading=");
@@ -289,26 +293,26 @@ void temperature_sensor()
   ////Serial.print("    Humidity = ");
   ////Serial.print(h);
   ////Serial.println(" % ");
- 
- 
-  if((t>=23)&&(sensorValue<900)&&(lock))
-    { 
-      lcd.clear();
-      lcd.setCursor(0,0);
-      lcd.print("Temperature ");
-      lcd.print(t);
-      lcd.setCursor(0,1);
-      lcd.print("AC ON");
-      digitalWrite(AC,HIGH);
-      }
-      else
-      digitalWrite(AC,LOW);
 
-      
+
+  if ((t >= 23) && (sensorValue < 1050) && (lock))
+  {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Temperature ");
+    lcd.print(t);
+    lcd.setCursor(0, 1);
+    lcd.print("AC ON");
+    digitalWrite(AC, HIGH);
+  }
+  else if((t<23)&&(!AC_flag))
+    digitalWrite(AC, LOW);
+
+
   Serial.print(t);
-   Serial.print(",");
-   Serial.print(h);
-   Serial.print(",");
+  Serial.print(",");
+  Serial.print(h);
+  Serial.print(",");
 
 }
 //********************************************************************************************************************//
@@ -319,7 +323,7 @@ void smokedetector()
   ////Serial.print("Sensor Value: ");
   ////Serial.print(sensorValue);
   Serial.println(sensorValue);
-  while ((sensorValue >= 900) && (!digitalRead(smokeoff_button)) && (!fire_acknowledge))
+  while ((sensorValue >= 1050) && (!digitalRead(smokeoff_button)) && (!fire_acknowledge))
   {
     lcd.clear();
     ////Serial.print(" | Smoke detected!");
@@ -339,7 +343,7 @@ void smokedetector()
     digitalWrite(buzzer, LOW);
     digitalWrite(fireLED, LOW);
   }
-  if (sensorValue < 900)
+  if (sensorValue < 1050)
     fire_acknowledge = 0;
   ////Serial.println("");
 }
@@ -377,21 +381,21 @@ void distancedetection()
       //Serial.println(" cm");
     }
   }
-     while(!lock &&(distance < 5)&&(!digitalRead(smokeoff_button))&&!(theft_acknowledge))
-     {
-      lcd.clear();
+  while (!lock && (distance < 5) && (!digitalRead(smokeoff_button)) && !(theft_acknowledge))
+  {
+    lcd.clear();
     //Serial.print(" BURGLAR ALARM!");
     digitalWrite(buzzer, !digitalRead(buzzer));
     digitalWrite(fireLED, !digitalRead(fireLED));
     lcd.setCursor(0, 0);
     lcd.print("BURGLAR ALERT!");
-    digitalWrite(pindetection,LOW); //turnoff led for enterance derection (works for unlocked mode only)
+    digitalWrite(pindetection, LOW); //turnoff led for enterance derection (works for unlocked mode only)
     delay(500);
-      
-      }
-   if (digitalRead(smokeoff_button))   //same button for fire alarm :)
+
+  }
+  if (digitalRead(smokeoff_button))   //same button for fire alarm :)
   {
-      theft_acknowledge = 1;
+    theft_acknowledge = 1;
   }
   if (theft_acknowledge)
   {
@@ -401,7 +405,7 @@ void distancedetection()
   if (distance >= 5)
     theft_acknowledge = 0;
   ////Serial.println(smokeoff_button);
-  
+
 }
 
 //*************************************************
@@ -428,7 +432,47 @@ void bluetoothmodule() {
     digitalWrite (device, LOW);
     //Serial.println("Device is off");
   }
-  delay(1000);
+  delay(500);
+  if (Serial.available() > 0)
+  {
+    char data = Serial.read(); // reading the data received from the bluetooth module
+    switch (data)
+    {
+      case '1':
+        {
+          digitalWrite(led, HIGH);
+          break;
+        }
+      case '2':
+        {
+          digitalWrite(led, LOW);
+          break;
+      } case '3':
+        {
+          digitalWrite(pindetection, HIGH);
+          break;
+        }
+      case '4':
+        {
+          digitalWrite(pindetection, LOW);
+          break;
+        }
+      case '5':
+        {
+          digitalWrite(AC, HIGH);
+          AC_flag=1;
+          break;
+        }
+      case '6':
+        {
+          digitalWrite(AC, LOW);
+          AC_flag=0;
+          break;
+        }
+      default : break;
+    }
+  }
+  delay(50);
 }
 //*************************************************************************************
 void Get_Order () {
@@ -591,14 +635,14 @@ void home_mode()
     Change_Password();
   }
 
-  if (digitalRead(lockswitch)&&lock==1)
+  if (digitalRead(lockswitch) && lock == 1)
   {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("HOME LOCKED");
     delay(3000);
-    lock=0;
- 
+    lock = 0;
+
   }
 
 }
