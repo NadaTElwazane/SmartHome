@@ -34,6 +34,5 @@ Implemented using [MIT App Inventor 2](http://ai2.appinventor.mit.edu/) .
 ## Contributors
 - Hager Ahmed
 - Haguar Tarek
-- Mariem Mostafa
 - [Nada Ehab](https://github.com/nadaehab31)
 - [Nada Elwazane](https://github.com/NadaTElwazane)
