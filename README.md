@@ -28,4 +28,12 @@ This is a Smart home project using Arduino.
 ## Mobile App
 Implemented using [MIT App Inventor 2](http://ai2.appinventor.mit.edu/) .
 
-The app is used to control the lights and AC. The app also displays the temperature and humidity of the home.
+- Controls the lights and AC. 
+- Displays temperature and humidity.
+
+## Contributors
+- Hager Ahmed
+- Haguar Tarek
+- Mariem Mostafa
+- [Nada Ehab](https://github.com/nadaehab31)
+- [Nada Elwazane](https://github.com/NadaTElwazane)
